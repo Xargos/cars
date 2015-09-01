@@ -3,6 +3,9 @@ __author__ = 'jpierzchlewicz'
 from scrapy import Item, Field, Spider, Request
 
 class Car(Item):
+	"""
+	The data holder
+	"""
     title = Field()
     brand = Field()
     model = Field()
@@ -28,6 +31,9 @@ class CarSpider(Spider):
     start_urls = ['http://otomoto.pl/osobowe/toyota/corolla/?search%5Bfilter_float_year%3Ato%5D=2005&search%5Bnew_used%5D=used']
 
     def parse(self, response):
+		"""
+		Parses the list of offers and once done moves to the next page.
+		"""
         counter = 1
         url = response.xpath("//*[@id=\"body-container\"]/div[2]/div[1]/div/div[3]/div[3]/article["+str(counter)+"]/div[2]/div/h3/a/@href").extract()
         while len(url) > 0:
@@ -43,6 +49,9 @@ class CarSpider(Spider):
             yield Request(next_page[0], callback=self.parse)
 
     def parse_offer(self, response):
+		"""
+		Parses a single offer.
+		"""
         car = Car()
         car['title'] = ''.join(response.xpath("//*[@id=\"siteWrap\"]/section/div[1]/header/div/div/div/h1/text()").extract()).strip()
         car['location'] = ''.join(response.xpath("//*[@class=\"address icon-lokalizacja\"]/text()").extract()[0]).strip()
